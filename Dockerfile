@@ -1,5 +1,5 @@
 # Stagio 1: A fase 'Build' - Constroi a aplicacao usando Maven
-# Versao do mavem que vem com o JDK
+# Usando uma imagem com JDK 21 para corresponder ao pom.xml
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 # Definindo o diretorio de trabalho dentro do conteiner
@@ -14,6 +14,11 @@ COPY .mvn/ .mvn
 COPY mvnw .
 COPY mvnw.cmd .
 
+# --- THE FIX ---
+# Garante que o script do Maven Wrapper tenha permissão de execução.
+# Isso é crucial, pois as permissões de arquivo podem ser perdidas durante o checkout do Git.
+RUN chmod +x mvnw
+
 # Copia o resto do codigo fonte da aplicacao.
 COPY src ./src
 
@@ -23,7 +28,7 @@ RUN ./mvnw package -DskipTests
 
 
 # Stage 2: A fase "Runtime" - Cria uma imagem leve e final
-# Usando uma minima imagem com JRE para um tamanho menor e reduzido.
+# Usando uma imagem JRE 21 para corresponder à versão de compilação
 FROM eclipse-temurin:21-jre-jammy
 
 # Definindo diretorio de trabalho
