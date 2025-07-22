@@ -1,6 +1,9 @@
 pipeline {
     agent any // Soh possuo um agent
-
+    options {
+            // Previne checkout defaultno inicio do pipeline
+            skipDefaultCheckout()
+        }
     stages {
         stage('Checkout') {
             steps {

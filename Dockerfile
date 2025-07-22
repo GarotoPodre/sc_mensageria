@@ -1,6 +1,6 @@
 # Stagio 1: A fase 'Build' - Constroi a aplicacao usando Maven
 # Versao do mavem que vem com o JDK
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 # Definindo o diretorio de trabalho dentro do conteiner
 WORKDIR /app
@@ -24,7 +24,7 @@ RUN ./mvnw package -DskipTests
 
 # Stage 2: A fase "Runtime" - Cria uma imagem leve e final
 # Usando uma minima imagem com JRE para um tamanho menor e reduzido.
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 # Definindo diretorio de trabalho
 WORKDIR /app
@@ -34,7 +34,7 @@ ARG JAR_FILE=/app/target/*.jar
 # Copia o arquivo JAR executavel do estágio "builder" usando ARG.
 COPY --from=builder ${JAR_FILE} app.jar
 
-EXPOSE 8080
+EXPOSE 8088
 
 # Comando para rodar a aplicacao quando o conteiner inicia.
 ENTRYPOINT ["java", "-jar", "app.jar"]
