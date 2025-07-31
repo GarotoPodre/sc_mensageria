@@ -15,6 +15,10 @@ pipeline {
         // Rodar testes antes de mais nada. Se falhar, o pipeline para.
         stage('Test') {
             steps {
+                // Garante que o script do Maven Wrapper tenha permissão de execução
+                // no workspace do Jenkins antes de ser chamado.
+                sh 'chmod +x mvnw'
+
                 // usando Maven Wrapper para executar o teste.
                 sh './mvnw test'
             }
