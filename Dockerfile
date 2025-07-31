@@ -6,7 +6,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 
 # Copiando o POM. Isso é feito primeiro para subir a camada de cache do Docker.
-# Se não houver alteracoes no pom.xml, o Docker não ira baixa novamente as dependencias no bulds subsequentes.
+# Se não houver alteracoes no pom.xml, o Docker não ira baixar novamente as dependencias no builds subsequentes.
 COPY pom.xml .
 
 # Copia os pacotes de arquivos mavem
