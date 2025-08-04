@@ -21,7 +21,7 @@ public class UsuarioTest {
 
         //Assert: verifica se o objeto foi criado corretamente
         assertNotNull(usuario);
-        assertEquals(nomeEsperado, usuario.getName());
+        assertEquals(nomeEsperado, usuario.getNome());
 
     }
 
