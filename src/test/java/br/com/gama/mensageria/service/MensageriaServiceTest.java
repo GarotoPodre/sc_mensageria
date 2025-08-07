@@ -8,12 +8,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 
 import static br.com.gama.mensageria.service.MensageriaService.EXCHANGE_MENSAGENS;
 import static br.com.gama.mensageria.service.MensageriaService.ROUTING_KEY_MENSAGEM;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,10 +32,19 @@ public class MensageriaServiceTest {
     private RabbitTemplate rabbitTemplate;
 
     /**
+     * @Mock cria um AmqpAdmin 'fake'.
+     * Verifica se a exchange foi criada corretamente
+     */
+    @Mock
+    private AmqpAdmin amqpAdmin;
+
+    /**
      * @InjectMocks cria um MensageriaService e injeta o rabbitTemplate fake nele
      */
     @InjectMocks
     private MensageriaService mensageriaService;
+
+
 
     /**
      * Verifica se a mensagem foi enviada corretamente, da forma que foi criada
@@ -54,6 +67,32 @@ public class MensageriaServiceTest {
         Mensagem mensagemEnviada = mensagemCaptor.getValue();
         assertEquals(sender, mensagemEnviada.getSender());
         assertEquals(content, mensagemEnviada.getContent());
+
+    }
+
+    @Test
+    @DisplayName("Deve criar uma exchange e um binding para novo usuario no RabbitMQ")
+    void shouldCreateQueueAndBindingForNewUser() {
+        //Arrange
+        String nome = "usuario";
+        String nomeFila = "fila."+nome;
+
+        //Act
+        mensageriaService.criarInfraestruturaParaUsuario(nome);
+
+        //Assert
+        //Capturando o objeto Queue que foi passado para o metodo declareQueue
+        ArgumentCaptor<Queue> queueArgumentCaptor = ArgumentCaptor.forClass(Queue.class);
+        verify(amqpAdmin).declareQueue(queueArgumentCaptor.capture());
+        assertEquals(nomeFila, queueArgumentCaptor.getValue().getName());
+
+        //Capturando o objeto Binding que foi passado para o metodo declareBinding
+        ArgumentCaptor<Binding> bindingArgumentCaptor = ArgumentCaptor.forClass(Binding.class);
+        verify(amqpAdmin).declareBinding(bindingArgumentCaptor.capture());
+        Binding binding=bindingArgumentCaptor.getValue();
+        assertEquals(nomeFila, binding.getDestination());
+        assertEquals(nome, binding.getRoutingKey());
+
 
     }
 }
