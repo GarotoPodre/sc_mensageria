@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: br.com.gama.mensageria.message_system.MessageSystemApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.865 s -- in br.com.gama.mensageria.message_system.MessageSystemApplicationTests

@@ -1,0 +1,5 @@
+/media/welington/Extreme Pro/pessoal/revisoes/engenharia_de_software/sc_mensageria/src/main/java/br/com/gama/mensageria/dominio/Mensagem.java
+/media/welington/Extreme Pro/pessoal/revisoes/engenharia_de_software/sc_mensageria/src/main/java/br/com/gama/mensageria/dominio/Usuario.java
+/media/welington/Extreme Pro/pessoal/revisoes/engenharia_de_software/sc_mensageria/src/main/java/br/com/gama/mensageria/message_system/MessageSystemApplication.java
+/media/welington/Extreme Pro/pessoal/revisoes/engenharia_de_software/sc_mensageria/src/main/java/br/com/gama/mensageria/service/AmqpManagementService.java
+/media/welington/Extreme Pro/pessoal/revisoes/engenharia_de_software/sc_mensageria/src/main/java/br/com/gama/mensageria/service/MensageriaService.java

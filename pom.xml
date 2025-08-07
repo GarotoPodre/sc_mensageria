@@ -66,11 +66,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version><!-- Boa pratica para travar a versao do plugin-->
 				<configuration>
+					<release>${java.version}</release><!-- Instrução explicita para o compilador-->
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+							<!-- Essa versão é gerenciada pelo Springboot-->
+							<version>${lombok.version}</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
