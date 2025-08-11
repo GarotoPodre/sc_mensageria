@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MessageConsumer {
-    public static final String FILA_GENERICA_MENSAGENS = "mensagens.generica";
+    public static final String FILA_MENSAGENS_GERAL = "mensagens.geral";
 
     private final WebSocketHandler webSocketHandler;
 
-    @RabbitListener(queues = FILA_GENERICA_MENSAGENS)
+    @RabbitListener(queues = FILA_MENSAGENS_GERAL)
     public void consumirMensagem(Mensagem mensagem) {
 
         log.info("Mensagem recebida: {}", mensagem);
