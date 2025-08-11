@@ -32,8 +32,6 @@ public class MensageriaServiceTest {
     @InjectMocks
     private MensageriaService mensageriaService;
 
-
-
     /**
      * Verifica se a mensagem foi enviada corretamente, da forma que foi criada
      */

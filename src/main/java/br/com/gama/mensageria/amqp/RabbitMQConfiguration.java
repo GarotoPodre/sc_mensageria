@@ -6,6 +6,8 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,13 +28,22 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
-    public TopicExchange mensagemExchange(){
+    public TopicExchange mensagensExchange(){
         return new TopicExchange(MensageriaService.EXCHANGE_MENSAGENS);
     }
 
     @Bean
-    public Binding bindingMensagensGeral(Queue filaMensagensGeral, TopicExchange mensagemExchange){
-        return BindingBuilder.bind(filaMensagensGeral).to(mensagemExchange).with(MensageriaService.ROUTING_KEY_MENSAGEM);
+    public Binding bindingMensagensGeral(Queue filaMensagensGeral, TopicExchange mensagensExchange){
+        return BindingBuilder.bind(filaMensagensGeral).to(mensagensExchange).with(MensageriaService.ROUTING_KEY_MENSAGEM);
+    }
+
+    /**
+     * Configura o conversor de mensagens para usa JSON (via Jackson)
+     * @return O conversor de mensagens configurado
+     */
+    @Bean
+    public MessageConverter jackson2JsonMessageConverter(){
+        return new Jackson2JsonMessageConverter();
     }
 
 }

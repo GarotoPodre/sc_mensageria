@@ -34,13 +34,13 @@ public class RabbitMQConfigurationTest {
         //Assert: verifica se um bean do tipo Queue com o nome correto existe no contexto
         Queue queue = context.getBean("filaMensagensGeral", Queue.class);
         assertNotNull(queue);
-        assertEquals(MessageConsumer.FILA_MENSAGENS_GERAL,queue.getName());
+        assertEquals(MessageConsumer.FILA_MENSAGENS_GERAL, queue.getName());
     }
 
     @Test
     @DisplayName("Deve criar um bean para a exchange principal de mensagens")
     void deveCriarBeanParaExchangePrincipalDeMensagens() {
-        Exchange exchange=context.getBean("mensagemExchange", Exchange.class);
+        Exchange exchange=context.getBean("mensagensExchange", Exchange.class);
         assertNotNull(exchange);
         assertEquals(MensageriaService.EXCHANGE_MENSAGENS,exchange.getName());
     }
@@ -50,8 +50,8 @@ public class RabbitMQConfigurationTest {
     void deveCriarBindingParaFilaGeral(){
         Binding binding = context.getBean("bindingMensagensGeral", Binding.class);
         assertNotNull(binding);
-        assertEquals(MessageConsumer.FILA_MENSAGENS_GERAL,binding.getDestination());
-        assertEquals(MensageriaService.ROUTING_KEY_MENSAGEM,binding.getRoutingKey());
+        assertEquals(MessageConsumer.FILA_MENSAGENS_GERAL, binding.getDestination());
+        assertEquals(MensageriaService.ROUTING_KEY_MENSAGEM, binding.getRoutingKey());
 
     }
 
