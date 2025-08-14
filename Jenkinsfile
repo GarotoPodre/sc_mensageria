@@ -23,7 +23,7 @@ pipeline {
                 sh './mvnw test'
                 // a variavel de ambiente que informa ao Springboot onde encontrar o RabbitMQ
                 //dentro da rede do docker compose. 'rabbitmq' é o nome do servico no docker-compose.yml
-                SPRING_RABBITMQ_HOST=rabbitmq ./mvnw test
+                sh SPRING_RABBITMQ_HOST=rabbitmq ./mvnw test
             }
         }
 // --- STAGE 2: Build (se o teste passar) ---
