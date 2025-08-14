@@ -18,9 +18,6 @@ pipeline {
                 // Garante que o script do Maven Wrapper tenha permissão de execução
                 // no workspace do Jenkins antes de ser chamado.
                 sh 'chmod +x mvnw'
-
-                // usando Maven Wrapper para executar o teste.
-                sh './mvnw test'
                 // a variavel de ambiente que informa ao Springboot onde encontrar o RabbitMQ
                 //dentro da rede do docker compose. 'rabbitmq' é o nome do servico no docker-compose.yml
                 sh 'SPRING_RABBITMQ_HOST=rabbitmq ./mvnw test'
