@@ -31,18 +31,16 @@ pipeline {
                      // Pega o pequeno hash git do commit para criar uma única tag rastreável
                      def commitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                      def uniqueImageTag = "welington/sc-mensageria:${commitHash}"
- //                    def latestImageTag = "welington/sc-mensageria:latest"
-                     def latestTag="latest"
+                     def imageName = "welington/sc-mensageria"
 
                      echo "Construindo imagem com tag unica: ${uniqueImageTag}"
 
                      // Constroi a imagem usando a tag unica.
                      // o '.' significa 'use o diretorio corrente como contexto de build'
-                     docker.build(uniqueImageTag, '.')
+                     def builtImage = docker.build(uniqueImageTag, '.')
 
                      // Também aplique a tag 'latest' para a mesma imagem por conveniencia.
- //                  docker.image(uniqueImageTag).tag(latestImageTag)
-                     docker.image(uniqueImageTag).tag(latestTag)
+                     builtImage.tag(imageName, "latest")
                      echo "Imagem construida com sucesso e tageada."
                 }
             }
