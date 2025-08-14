@@ -37,11 +37,13 @@ pipeline {
 
                      // Constroi a imagem usando a tag unica.
                      // o '.' significa 'use o diretorio corrente como contexto de build'
-                     def builtImage = docker.build(uniqueImageTag, '.')
+                     docker.build(uniqueImageTag, '.')
+                     echo "Imagem construida com sucesso, com a tag ${uniqueImageTag}."
 
                      // Também aplique a tag 'latest' para a mesma imagem por conveniencia.
-                     builtImage.tag(imageName, "latest")
-                     echo "Imagem construida com sucesso e tageada."
+                     def latestImageTag = "${imageName}:latest"
+                     sh "docker tag ${uniqueImageTag} ${latestImageTag}"
+                     echo "Aplicada a tag 'latest' para a imagem: ${latestImageTag}."
                 }
             }
         }
