@@ -59,6 +59,18 @@
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Powerful tool for running Docker containers directly from the Java tests.
+		It's perfect for creating isolated, reliable INTEGRATION TESTS-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>rabbitmq</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

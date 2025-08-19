@@ -10,7 +10,7 @@ import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import java.util.Map;
 
 /**
- *  Classe responsável por mapear a url /ws/mensagens to o WebSocketHandler reativo
+ *  Classe responsável por mapear a url /ws/mensagens para o WebSocketHandler reativo
 * */
 @Configuration
 @RequiredArgsConstructor
