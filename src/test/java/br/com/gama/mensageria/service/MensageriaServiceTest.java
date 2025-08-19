@@ -41,9 +41,10 @@ public class MensageriaServiceTest {
         //Arrange
         String sender = "sender";
         String content = "Oi, Mocks!";
+        String roomName="sala_teste";
 
         //Act
-        mensageriaService.sendMessage(sender, content);
+        mensageriaService.sendMessage(roomName,sender, content);
 
         //Assert: verifica se o nosso serviço chamou o metodo correto no mock
         ArgumentCaptor<Mensagem> mensagemCaptor = ArgumentCaptor.forClass(Mensagem.class);

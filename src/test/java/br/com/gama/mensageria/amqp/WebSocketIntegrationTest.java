@@ -71,9 +71,10 @@ public class WebSocketIntegrationTest {
 
         String sender = "TesteDeIntegracao";
         String content = "Salve, Reactive WebSocket!";
+        //String roomName="sala_teste";
 
         // Act: Envia uma mensagem para o RabbitMQ através do nosso serviço
-        mensageriaService.sendMessage(sender, content);
+        mensageriaService.sendMessage(null,sender, content);
 
         // Assert: Verifica se o cliente WebSocket recebeu a mensagem
         String receivedMessageJson = mensagensRecebidas.poll(5, TimeUnit.SECONDS);
