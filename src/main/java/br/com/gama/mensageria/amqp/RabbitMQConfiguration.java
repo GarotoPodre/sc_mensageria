@@ -1,10 +1,17 @@
 package br.com.gama.mensageria.amqp;
 
-import br.com.gama.mensageria.service.MensageriaService;
+
 import br.com.gama.mensageria.service.MessageConsumer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,10 +33,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfiguration {
 
+    public static final String EXCHANGE_NAME = "mensagens.exchange";
+    public static final String ROUTING_KEY_GERAL="room.geral";
+
     //>>>>>>>>>>>>BEANS DA EXCHANGE PRINCIPAL<<<<<<<<<<<<<<<<<
     @Bean
-    public TopicExchange mensagensExchange(){
-        return new TopicExchange(MensageriaService.EXCHANGE_MENSAGENS);
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory){
+        return new RabbitAdmin(connectionFactory);
+    }
+
+    @Bean
+    public TopicExchange topicExchange(){
+        //return new TopicExchange(MensageriaService.EXCHANGE_MENSAGENS);
+        return new TopicExchange(EXCHANGE_NAME);
     }
 
     //>>>>>>>>>>>>BEANS DA FILA PRINCIPAL<<<<<<<<<<<<<<<<<
@@ -40,8 +56,8 @@ public class RabbitMQConfiguration {
                 .build();
     }
     @Bean
-    public Binding bindingMensagensGeral(Queue filaMensagensGeral, TopicExchange mensagensExchange){
-        return BindingBuilder.bind(filaMensagensGeral).to(mensagensExchange).with(MensageriaService.ROUTING_KEY_MENSAGEM);
+    public Binding bindingMensagensGeral(Queue filaMensagensGeral, TopicExchange topicExchange){
+        return BindingBuilder.bind(filaMensagensGeral).to(topicExchange).with(ROUTING_KEY_GERAL);
     }
 
     //>>>>>>>>>>>>BEANS DE RESILIENCIA (DEAD LETTER)<<<<<<<<<<<<<<<<<
@@ -76,8 +92,18 @@ public class RabbitMQConfiguration {
      * @return O conversor de mensagens configurado
      */
     @Bean
-    public MessageConverter jackson2JsonMessageConverter(){
-        return new Jackson2JsonMessageConverter();
+    public MessageConverter jsonMessageConverter(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter){
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(messageConverter);
+        return rabbitTemplate;
     }
 
 }
