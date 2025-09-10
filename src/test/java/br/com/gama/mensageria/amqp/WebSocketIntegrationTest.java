@@ -69,12 +69,15 @@ public class WebSocketIntegrationTest {
         // Espera pela conexão pro até 2 segundos
         connectionLatch.await(2, TimeUnit.SECONDS);
 
+        String roomName="sala_teste";
         String sender = "TesteDeIntegracao";
-        String content = "Salve, Reactive WebSocket!";
-        //String roomName="sala_teste";
+        String content = "Salve, Sala!";
+
+        //Arrange: Garantindo que a sala exista
+        mensageriaService.criarSala(roomName);
 
         // Act: Envia uma mensagem para o RabbitMQ através do nosso serviço
-        mensageriaService.sendMessage(null,sender, content);
+        mensageriaService.sendMessage(roomName,sender, content);
 
         // Assert: Verifica se o cliente WebSocket recebeu a mensagem
         String receivedMessageJson = mensagensRecebidas.poll(5, TimeUnit.SECONDS);

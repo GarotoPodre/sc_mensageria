@@ -12,13 +12,19 @@ import java.time.LocalDateTime;
  * podem ser consideradas iguais
  */
 @Getter
+@Setter
+@NoArgsConstructor
 @ToString
-@RequiredArgsConstructor
-@EqualsAndHashCode(of = {"sender", "content"}) // Adicionado para definir a igualdade de valor
 public class Mensagem implements Serializable {
-    private final String sender;
-    private final String content;
-    private final LocalDateTime timestamp=LocalDateTime.now();
+    private String sender;
+    private String content;
+    private LocalDateTime timestamp;
+
+    public Mensagem(String sender, String content) {
+        this.sender = sender;
+        this.content = content;
+        this.timestamp=LocalDateTime.now();
+    }
 
 
 

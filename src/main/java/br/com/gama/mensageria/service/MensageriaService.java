@@ -21,12 +21,12 @@ public class MensageriaService {
     private final RabbitTemplate rabbitTemplate;
     private final RabbitAdmin rabbitAdmin;
     private final TopicExchange topicExchange;
+    private final DynamicListenerManager listenerManager;
 
 
     public void sendMessage(String roomName, String sender, String content) {
 
         Mensagem mensagem = new Mensagem(sender, content);
-        //rabbitTemplate.convertAndSend(EXCHANGE_MENSAGENS, ROUTING_KEY_MENSAGEM, mensagem);
         String routingKey = roomName != null ? roomName:ROUTING_KEY_MENSAGEM;
 
         log.info("Enviando mensagem para a sala '{}' com a chave de roteamento '{}': {}", roomName, routingKey, mensagem);
@@ -35,15 +35,15 @@ public class MensageriaService {
     }
 
     public void criarSala(String roomName) {
-        String qeueName = "room."+roomName;
+        String queueName = "room."+roomName;
         String routingkey = roomName;//a chave de roteamento é o próprio nome da sala
 
-        Queue queue = new Queue(qeueName, true);
+        Queue queue = new Queue(queueName, true);
         Binding binding = BindingBuilder.bind(queue).to(topicExchange).with(routingkey);
 
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin.declareBinding(binding);
-        log.info("Sala '{}' criada com a fila '{}' e binding para a chave '{}'", roomName, qeueName, routingkey);
+        //log.info("Sala '{}' criada com a fila '{}' e binding para a chave '{}'", roomName, queueName, routingkey);
 
     }
 }
