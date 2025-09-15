@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.socket.CloseStatus;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
+import java.security.Principal;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -22,9 +24,6 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 @Log4j2
 public class WebSocketHandler implements org.springframework.web.reactive.socket.WebSocketHandler {
-
-    //private final Sinks.Many<Mensagem> messageSink = Sinks.many().multicast().onBackpressureBuffer();
-    //private final Flux<String> messageFlux;
 
     private final ObjectMapper objectMapper;
     private final DynamicListenerManager listenerManager;
@@ -78,22 +77,40 @@ public class WebSocketHandler implements org.springframework.web.reactive.socket
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        log.info("Nova conexão WebSocket estabelecida: {}", session.getId());
-        sessionSubscriptions.put(session, ConcurrentHashMap.newKeySet());
 
-        return session.receive()
-                .map(WebSocketMessage::getPayloadAsText)
-                .flatMap(jsonPayLoad -> routeIncomingMessage(session, jsonPayLoad))
-                .doOnError(e -> log.error("Erro no fluxo de entrada do WebSocket para a sessão {}",session.getId(),e))
-                .doFinally(signalType -> {
-                    log.info("Conexão WebSocket {} terminando ({}), limpando inscrições.", session.getId(), signalType);
-                    cleanupSubscriptions(session);
+        //O usuário 'principal' é disponibilizado vindo do handshake info.
+        Mono<Principal> principalMono = session.getHandshakeInfo().getPrincipal();
 
-                })
-                .then();
-    }
+            return principalMono
+                    .flatMap(principal ->{
+                        //Lógica para uma conexão autenticada bem-sucedida
+                        log.info("Nova conexão WebSocket autenticada para o usuário: '{}' (sessão: {})", principal.getName(), session.getId());
+                        sessionSubscriptions.put(session, ConcurrentHashMap.newKeySet());
 
-    private Mono<Void> routeIncomingMessage(WebSocketSession session, String jsonPayload) {
+                        //Passa o principal autenticado para o roteador de mensagens
+                        return session.receive()
+                                .map(WebSocketMessage::getPayloadAsText)
+                                .flatMap(jsonPayLoad -> routeIncomingMessage(session, principal, jsonPayLoad))
+                                .doOnError(e -> log.error("Erro no fluxo de entrada do WebSocket para a sessão {}",session.getId(),e))
+                                .doFinally(signalType -> {
+                                    log.info("Conexão WebSocket {} terminando ({}), limpando inscrições.", session.getId(), signalType);
+                                    cleanupSubscriptions(session);
+
+                                })
+                                .then();
+
+                    })
+                    .switchIfEmpty(Mono.defer(() ->{
+                        //Lógica para uma conexão não autenticada
+                        //Rejeita ativamente a conexão em vez de falhar silenciosamente.
+                        log.warn("Tentativa de conexão WebSocket não autenticada da sessão {}. Fechando conexão.", session.getId());
+                        return session.close(new CloseStatus(CloseStatus.POLICY_VIOLATION.getCode(), "Acesso não autorizado. Token ausente ou inválido."));
+                    }));
+                }
+
+
+
+    private Mono<Void> routeIncomingMessage(WebSocketSession session, Principal principal, String jsonPayload) {
         return Mono.fromRunnable(() ->{
             try {
                 log.info("Mensagem recebida via WebSocket: {}", jsonPayload);
@@ -110,12 +127,13 @@ public class WebSocketHandler implements org.springframework.web.reactive.socket
                         }
                         break;
                     case "chat_message":
-                        String sender = jsonNode.path("sender").asText();
+                       // String sender = jsonNode.path("sender").asText();
                         String content = jsonNode.path("content").asText();
                         String roomName = jsonNode.path("roomName").asText();
 
-                        if (roomName != null && !roomName.isEmpty() && sender != null && !sender.isEmpty()){
-                            Mensagem chatMessage = new Mensagem(sender, content);
+                        //Usa o nome do 'Principal' acreditado como nome do sender e não o que o cliente coloca.
+                        if (roomName != null && !roomName.isEmpty()){// && sender != null && !sender.isEmpty()){
+                            Mensagem chatMessage = new Mensagem(principal.getName(), content);
                             messagePublisher.publishMessageToRoom(roomName, chatMessage);
                         }
                         break;
